@@ -1,4 +1,5 @@
 import { useQuery } from "react-query";
+import {array} from 'prop-types'
 
 const fetchData = async () => {
   try {
@@ -14,7 +15,29 @@ const fetchData = async () => {
   }
 };
 
-const getTitle = (array=[], current ={}) => {
+const RecursiveComponent = ({Section}) => {
+  return (
+    <div style={{ paddingLeft: "20px" }}>
+      {Section.map((parent) => {
+        return (
+          <div key={parent.TOCHeading}>
+            <span>{parent.TOCHeading}</span>
+            {/* Base Condition and Rendering recursive component from inside itself */}
+            <div>
+              {parent.Section && <RecursiveComponent Section={parent.Section} />}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+RecursiveComponent.propTypes = {
+  Section: array
+}
+
+/* const getTitle = (array=[], current ={}) => {
 
  if(current?.TOCHeading){
   console.warn(current?.TOCHeading)
@@ -31,7 +54,7 @@ const getTitle = (array=[], current ={}) => {
     getTitle(Section);
 });
   
-}
+} */
 
 export const LandingPage = () => {
   const { data = [], isLoading } = useQuery({
@@ -39,13 +62,13 @@ export const LandingPage = () => {
     queryFn: fetchData,
   });
 
-  console.warn(data.map((obj) => getTitle(obj)))
+  //console.warn(data.map((obj) => getTitle(obj)))
 
   return isLoading ? (
     <p>Loading</p>
   ) : (
     <div>
-      
+      <RecursiveComponent Section={data}/>
     </div>
   );
 };
